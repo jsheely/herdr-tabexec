@@ -1,0 +1,23 @@
+# Build output (Herdr compiles the plugin at install time)
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go test / coverage artifacts
+*.test
+*.out
+coverage.*
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

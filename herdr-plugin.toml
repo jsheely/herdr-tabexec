@@ -1,0 +1,94 @@
+# herdr plugin: Tab Exec
+#
+#   - Map tab labels to executables in config.toml ([[tools]] blocks). A tab
+#     whose label matches launches its executable in its pane, whether the tab
+#     was just created, just renamed, or restored after a Herdr restart.
+#   - Actions `pull` / `push` run `git pull` / `git push` in the folder of the
+#     focused pane and show the output in a popup. Bind them to keys in your
+#     Herdr config (see README.md).
+#   - Action `popup` opens the focused tab's executable (or the first
+#     configured one) in a popup pane in the focused pane's folder.
+#
+# Install:   herdr plugin install jsheely/herdr-tabexec
+# Local dev: herdr plugin link /path/to/herdr-tabexec
+# Logs:      herdr plugin log list --plugin jsheely.tabexec
+# Config:    herdr plugin config-dir jsheely.tabexec   (config.toml)
+
+id = "jsheely.tabexec"
+name = "Tab Exec"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "Launch a configured executable per tab label (including after restart) and pull/push from the focused tab's folder."
+platforms = ["linux", "macos", "windows"]
+
+# Compiled at install time with the plugin root as cwd. Zero external Go deps,
+# so this works offline.
+[[build]]
+command = ["go", "build", "-trimpath", "-o", "bin/herdr-tabexec", "."]
+platforms = ["linux", "macos"]
+
+[[build]]
+command = ["go", "build", "-trimpath", "-o", "bin/herdr-tabexec.exe", "."]
+platforms = ["windows"]
+
+# Restart recovery: after Herdr restores the session, relaunch the mapped
+# executable in every matching tab (skips panes where it is already running).
+[[startup]]
+command = ["./bin/herdr-tabexec", "startup"]
+
+[[events]]
+on = "tab.created"
+command = ["./bin/herdr-tabexec", "event"]
+
+[[events]]
+on = "tab.renamed"
+command = ["./bin/herdr-tabexec", "event"]
+
+[[actions]]
+id = "pull"
+title = "Git pull (focused tab's folder)"
+contexts = ["global", "workspace", "tab", "pane"]
+command = ["./bin/herdr-tabexec", "action"]
+
+[[actions]]
+id = "push"
+title = "Git push (focused tab's folder)"
+contexts = ["global", "workspace", "tab", "pane"]
+command = ["./bin/herdr-tabexec", "action"]
+
+[[actions]]
+id = "popup"
+title = "Tool popup (focused tab's folder)"
+contexts = ["global", "workspace", "tab", "pane"]
+command = ["./bin/herdr-tabexec", "action"]
+
+[[actions]]
+id = "open"
+title = "Launch the tab's tool in the focused pane"
+contexts = ["global", "workspace", "tab", "pane"]
+command = ["./bin/herdr-tabexec", "action"]
+
+[[actions]]
+id = "restore"
+title = "Relaunch tools in all matching tabs"
+contexts = ["global", "workspace", "tab", "pane"]
+command = ["./bin/herdr-tabexec", "action"]
+
+# Full-screen-ish popup running a tool. Opened by the `popup` action so it
+# starts in the focused pane's folder; closes when the tool exits.
+[[panes]]
+id = "tool"
+title = "Tool"
+placement = "popup"
+width = "90%"
+height = "90%"
+command = ["./bin/herdr-tabexec", "tool-pane"]
+
+# Popup that shows git pull/push output. Opened by the pull/push actions.
+[[panes]]
+id = "git-op"
+title = "Git"
+placement = "popup"
+width = "70%"
+height = "60%"
+command = ["./bin/herdr-tabexec", "git-pane"]
