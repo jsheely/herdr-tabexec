@@ -15,7 +15,7 @@ executables:
   in a popup. Bind them to `prefix+p` / `prefix+shift+p` (see below).
 - **Quick popup.** The `popup` action opens the focused tab's program (or the
   first configured one) in a popup pane in the focused pane's folder. Quit the
-  program and the popup closes. Bind it to `prefix+ctrl+g`.
+  program and the popup closes. No default binding is suggested.
 
 ## Requirements
 
@@ -44,7 +44,7 @@ Herdr plugins cannot register keys themselves, so add these to your Herdr
 config (`herdr --help` prints its path; on Windows it is
 `%APPDATA%\herdr\config.toml`). By default Herdr already uses `prefix+p` for
 `previous_tab` and `prefix+shift+p` for `rename_pane`, so free them first or
-pick other keys. `prefix+ctrl+g` is unused by default.
+pick other keys.
 
 ```toml
 [keys]
@@ -60,11 +60,6 @@ command = "jsheely.tabexec.pull"
 key = "prefix+shift+p"
 type = "plugin_action"
 command = "jsheely.tabexec.push"
-
-[[keys.command]]
-key = "prefix+ctrl+g"
-type = "plugin_action"
-command = "jsheely.tabexec.popup"
 ```
 
 Then run `herdr server reload-config` (or press the reload binding).
