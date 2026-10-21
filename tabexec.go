@@ -1,10 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -82,63 +80,6 @@ func ensureToolForTab(tool Tool, tab TabInfo, panes []PaneInfo, reason string) e
 		return err
 	}
 	logf("%s: tab %s (%q) has no agent-free pane", reason, tab.TabID, tab.Label)
-	return nil
-}
-
-// openToolPopup is the `popup` action: open the popup pane in the focused
-// pane's folder, running the tool for the focused tab (or the first tool).
-func openToolPopup(cfg Config) error {
-	ctx := loadContext()
-	tool, ok := cfg.toolForContext(ctx)
-	if !ok {
-		notify("popup failed", "no [[tools]] configured")
-		return errors.New("popup: no tools configured")
-	}
-	cwd, err := resolveActionCwd(ctx)
-	if err != nil {
-		notify("popup failed", err.Error())
-		return err
-	}
-	return openPluginPane("tool", cwd, "HERDR_TABEXEC_CMD="+tool.Command)
-}
-
-// runToolPane is the body of the popup pane: run HERDR_TABEXEC_CMD (falling
-// back to the first tool's command) with the terminal attached, in
-// HERDR_TABEXEC_CWD. The popup closes when the command exits.
-func runToolPane(cfg Config) error {
-	cwd := cleanPath(os.Getenv("HERDR_TABEXEC_CWD"))
-	if cwd == "" {
-		cwd, _ = os.Getwd()
-	}
-	command := strings.TrimSpace(os.Getenv("HERDR_TABEXEC_CMD"))
-	if command == "" && len(cfg.Tools) > 0 {
-		command = cfg.Tools[0].Command
-	}
-	argv, err := splitCommand(command)
-	if err == nil && len(argv) == 0 {
-		err = errors.New("no command configured")
-	}
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		waitForEnter()
-		return err
-	}
-	cmd := exec.Command(argv[0], argv[1:]...)
-	cmd.Dir = cwd
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		var exit *exec.ExitError
-		if errors.As(err, &exit) && exit.ExitCode() > 0 {
-			// the program.s own non-zero exits (e.g. declining to init a repo)
-			// are not plugin errors; just let the popup close.
-			return nil
-		}
-		fmt.Fprintf(os.Stderr, "\n%s: %v\n", command, err)
-		waitForEnter()
-		return err
-	}
 	return nil
 }
 

@@ -13,9 +13,6 @@ executables:
 - **Pull / push from wherever you are.** Two actions, `pull` and `push`, run
   `git pull` / `git push` in the folder of the focused pane and show the output
   in a popup. Bind them to `prefix+p` / `prefix+shift+p` (see below).
-- **Quick popup.** The `popup` action opens the focused tab's program (or the
-  first configured one) in a popup pane in the focused pane's folder. Quit the
-  program and the popup closes. No default binding is suggested.
 
 ## Requirements
 
@@ -129,7 +126,6 @@ directly, without a shell, so aliases and shell functions will not resolve.
 | `[[startup]]` | After Herdr restores the session, takes one `herdr api snapshot`, finds every matching tab, and launches its tool in the tab's first agent-free pane. |
 | `[[actions]] pull` / `push` | Reads the focused pane's cwd from `HERDR_PLUGIN_CONTEXT_JSON`, then opens the plugin's `git-op` popup pane which runs the git command in that folder. |
 | `[[panes]] git-op` | The popup body. Runs the command with the terminal attached so progress output and credential prompts work. |
-| `[[actions]] popup` + `[[panes]] tool` | Opens a 90% popup pane and runs the focused tab's tool (or the first one) in the focused pane's folder. The popup closes when the program exits. |
 
 Before launching, the plugin skips panes that host a detected agent (so it
 never types into Claude or Codex), panes where the program is already running,

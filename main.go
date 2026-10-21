@@ -2,9 +2,8 @@
 //
 //	startup   [[startup]] hook: relaunch the command in every matching tab
 //	event     [[events]] hook for tab.created / tab.renamed
-//	action        [[actions]] hook; HERDR_PLUGIN_ACTION_ID selects pull/push/popup/open/restore
+//	action        [[actions]] hook; HERDR_PLUGIN_ACTION_ID selects pull/push/open/restore
 //	git-pane      body of the popup pane that shows git pull/push output
-//	tool-pane     body of the popup pane that runs the command
 package main
 
 import (
@@ -16,7 +15,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: herdr-tabexec startup|event|action|git-pane|tool-pane")
+		fmt.Fprintln(os.Stderr, "usage: herdr-tabexec startup|event|action|git-pane")
 		os.Exit(2)
 	}
 	cfg := loadConfig()
@@ -31,8 +30,6 @@ func main() {
 		err = handleAction(cfg)
 	case "git-pane":
 		err = runGitPane(cfg)
-	case "tool-pane":
-		err = runToolPane(cfg)
 	default:
 		err = fmt.Errorf("unknown mode %q", os.Args[1])
 	}
@@ -113,8 +110,6 @@ func handleAction(cfg Config) error {
 	switch action {
 	case "pull", "push":
 		return runGitAction(cfg, action)
-	case "popup":
-		return openToolPopup(cfg)
 	case "open":
 		ctx := loadContext()
 		if ctx.FocusedPaneID == "" {

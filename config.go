@@ -12,7 +12,7 @@ import (
 type Tool struct {
 	// Tab labels (case-insensitive, trimmed) that auto-launch Command.
 	TabNames []string
-	// Command typed into the tab's shell (and run by the popup action).
+	// Command typed into the tab's shell.
 	Command string
 	// Substrings (case-insensitive) that, found in a pane's foreground process
 	// names or terminal title, mean the command is already running. Empty
